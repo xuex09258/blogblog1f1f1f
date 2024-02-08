@@ -1,0 +1,36 @@
+
+const MOCK_POSTS = [
+    {
+        id: 'p1',
+        title: '文章1',
+        tags:['chatGPT'],
+        content:'ChatGPT'
+    },
+    {
+        id: 'p2',
+        title: '文章2',
+        tags:['frontend'],
+        content:'Micro frontend'
+        
+    }
+]
+
+//@router  GET api/posts/:postId
+//@desc 取得文章資訊(單一)
+//取得文章資料
+const getPost =  (req,res,next)=>{
+    const postId = req.params.postId;
+    const post = MOCK_POSTS.find(post =>{
+        return post.id === postId;
+    });
+
+    //若文章不存在於假資料(資料庫)
+    if(!post){
+        const error = new Error('此id的文章不存在');
+        error.status = 404;
+        throw error; //會觸發error middleware
+    }
+    res.json({post});
+}
+
+exports.getPost = getPost;
