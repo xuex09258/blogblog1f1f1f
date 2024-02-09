@@ -1,10 +1,9 @@
 const express = require('express');
-
+const cors = require('cors'); //引入套件
 const mongoose =  require('mongoose');
 const connectDB = require('./config/db');
 
 const app = express();
-const port = 5000;
 const postRoutes = require('./routes/posts-routes');
 const authRoutes = require('./routes/auth-routes');
 const bodyParser = require('body-parser');
@@ -13,6 +12,16 @@ const images = require('./routes/image-routes');
 
 //連接到資料庫
 connectDB();
+
+//cors設置
+const corsOptions = {
+  origin: 'http://localhost:3000', //我們將前端運行的port設定進來
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // 設定允許的 HTTP 方法
+  optionsSuccessStatus: 204,
+};
+
+// 啟用 CORS 中介軟體
+app.use(cors(corsOptions));
 
 app.use(bodyParser.json()); // 解析 JSON 
 
@@ -45,6 +54,5 @@ app.use((err, req, res, next) => {
  });
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-}); 
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
