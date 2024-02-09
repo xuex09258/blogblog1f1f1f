@@ -1,4 +1,5 @@
 {
+    "NODE_ENV" : "development",
     "mongoURI": "mongodb+srv://xuex09258gcp:xtTkzokmSIyp7vDT@cluster0.wod3tpd.mongodb.net/?retryWrites=true&w=majority",
     "jwtSecret": "secrettoken",
     "fileMaxSize": "2000000"
