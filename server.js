@@ -8,14 +8,14 @@ const postRoutes = require('./routes/posts-routes');
 const authRoutes = require('./routes/auth-routes');
 const bodyParser = require('body-parser');
 const users = require('./routes/users-routes'); //引入users-routes.js
-const images = require('./routes/image-routes');
+//const images = require('./routes/image-routes');
 
 //連接到資料庫
 connectDB();
 
 //cors設置
 const corsOptions = {
-  origin: 'http://localhost:3000', //我們將前端運行的port設定進來
+  origin: process.env.FRONTEND || 'http://localhost:3000', // 設定允許的來源
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // 設定允許的 HTTP 方法
   optionsSuccessStatus: 204,
 };
@@ -35,7 +35,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/api/auth', authRoutes); //引入我們的auth
 app.use('/api/posts',postRoutes);
 app.use('/api/users', users);
-app.use('/api/images', images);
+//app.use('/api/images', images);
 
 app.use((err, req, res, next) => {
   //檢查是否已經向客戶端發送了HTTP header，如果已經發送了，表示已經無法再修改狀態碼和header
