@@ -1,3 +1,4 @@
+//const HttpError = require('../models/http-error');
 const Post = require('../models/Post');
 
 const MOCK_POSTS = [
@@ -15,6 +16,76 @@ const MOCK_POSTS = [
         
     }
 ]
+
+//取得所有文章(依照標籤分類)
+exports.getPostsByTag =  async (req,res,next) =>{
+  try {
+       const results = await Post.aggregate([
+             // 使用 $unwind 來擴展 tags這個陣列
+             {
+                 $unwind: "$tags"
+             },
+             //根據tag來組合回傳的資料
+             {
+                 $group: {
+                     _id: "$tags", // 使用 tag 作為群組的 ID
+                     posts: {
+                         $push: {
+                             title: "$title",
+                             content: "$content",
+                             tags: "$tags",
+                             authorId: "$authorId",
+                             createdDate: "$createdDate",
+                         }
+                     }
+                 }
+             },
+             //根據文章建立時間排序
+             {
+                 $sort: { "posts.createdDate": -1 }
+             },
+             // 調整回傳資料
+             {
+                 $project: {
+                     tag: "$_id",
+                     posts: 1, //保留posts。數字1代表該欄位被包含在回傳資料中。
+                     _id: 0  // 將_id從回傳內容中排除。因為每個MongoDB文件都會有一個自動生成的_id，但在這裡我們不希望它出現在回傳的資料中
+                 }
+             }
+         ]);
+ 
+         res.json(results);
+         
+     } catch (err) {
+         next(new HttpError('Server error', 500));
+     }
+ } 
+
+//取得所有文章
+exports.getAllPost =  async (req,res,next) =>{
+  try {
+      const { tag, title } = req.query;
+
+      let queryObj = {};
+
+      //若有tag參數
+      if (tag) {
+         queryObj.tags = { $regex: new RegExp(tag, 'i') }; // 使用正規表達式進行模糊搜尋
+      }
+
+      //若有title參數
+      if (title) {
+          queryObj.title = new RegExp(title, 'i'); // 使用正規表達式進行模糊搜尋
+      }
+
+      const posts = await Post.find(queryObj);
+      
+      res.json(posts);
+
+  } catch (err) {
+      next(new HttpError('Server error', 500));
+  }
+}
 
 //@router  GET api/posts/:postId
 //@desc 取得文章資訊(單一)
